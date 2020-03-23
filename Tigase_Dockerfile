@@ -1,0 +1,24 @@
+
+# Ubuntu/precise is the main distribution
+FROM ubuntu:18.04
+
+# setup dependencies
+RUN rm -rvf /var/lib/apt/lists/*
+RUN apt-get update -y
+RUN apt-get install -y wget
+RUN apt-get install -y unzip
+RUN apt-get install -y default-jre
+RUN apt-get install --no-install-recommends -y libssl1.0.0 openssl postgresql-client
+RUN apt-get install --no-install-recommends -y software-properties-common
+
+# download and install tigase
+RUN wget -O tigase-server-8.0.0.zip 'https://github.com/tigase/tigase-server/releases/download/tigase-server-8.0.0/tigase-server-8.0.0-b10083-dist-max.zip'
+RUN unzip tigase-server-8.0.0.zip
+
+# start tigase
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
+#RUN tigase-server-8.0.0-b10083/scripts/tigase.sh start etc/tigase.conf; wait $!
+CMD cd tigase-server-8.0.0-b10083; java -version; ./scripts/tigase.sh run etc/tigase.conf; wait $!
+
+# expose tigase ports
+EXPOSE 5222 5223 5269 5270 5290 8080
